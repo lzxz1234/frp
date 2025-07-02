@@ -47,6 +47,7 @@ type ClientCommonConf struct {
 	TLSEnable         bool                `json:"tls_enable"`
 	HeartBeatInterval int64               `json:"heartbeat_interval"`
 	HeartBeatTimeout  int64               `json:"heartbeat_timeout"`
+	PermissionToken   string              `json:"permission_token"`
 }
 
 func GetDefaultClientConf() *ClientCommonConf {
@@ -73,6 +74,7 @@ func GetDefaultClientConf() *ClientCommonConf {
 		TLSEnable:         false,
 		HeartBeatInterval: 30,
 		HeartBeatTimeout:  90,
+		PermissionToken:   "",
 	}
 }
 
@@ -218,6 +220,10 @@ func UnmarshalClientConfFromIni(defaultCfg *ClientCommonConf, content string) (c
 		} else {
 			cfg.HeartBeatInterval = v
 		}
+	}
+
+	if tmpStr, ok = conf.Get("common", "permission_token"); ok {
+		cfg.PermissionToken = tmpStr
 	}
 	return
 }

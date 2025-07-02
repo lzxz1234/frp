@@ -199,6 +199,10 @@ func (svr *Service) login() (conn frpNet.Conn, session *fmux.Session, err error)
 		PrivilegeKey: util.GetAuthKey(g.GlbClientCfg.Token, now),
 		Timestamp:    now,
 		RunId:        svr.runId,
+		// PermissionToken will be loaded from config in g.GlbClientCfg
+		// For now, it might be empty if not set in config, or a value if set.
+		// The config loading part is in the next step.
+		PermissionToken: g.GlbClientCfg.PermissionToken,
 	}
 
 	if err = msg.WriteMsg(conn, loginMsg); err != nil {

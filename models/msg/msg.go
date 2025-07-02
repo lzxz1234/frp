@@ -73,6 +73,9 @@ type Login struct {
 
 	// Some global configures.
 	PoolCount int `json:"pool_count"`
+
+	// Additional token for permission validation.
+	PermissionToken string `json:"permission_token,omitempty"`
 }
 
 type LoginResp struct {

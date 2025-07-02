@@ -368,6 +368,27 @@ func (svr *Service) RegisterControl(ctlConn frpNet.Conn, loginMsg *msg.Login) (e
 		return
 	}
 
+	// Check permission token.
+	if g.GlbServerCfg.ExpectedPermissionToken != "" {
+		if loginMsg.PermissionToken != g.GlbServerCfg.ExpectedPermissionToken {
+			if loginMsg.PermissionToken == "" {
+				log.Warn("Client [%s] login without permission token, expected: %s", ctlConn.RemoteAddr().String(), g.GlbServerCfg.ExpectedPermissionToken)
+				err = fmt.Errorf("permission token is required and was not provided")
+			} else {
+				log.Warn("Client [%s] login with incorrect permission token: [%s], expected: %s", ctlConn.RemoteAddr().String(), loginMsg.PermissionToken, g.GlbServerCfg.ExpectedPermissionToken)
+				err = fmt.Errorf("incorrect permission token")
+			}
+			return
+		}
+		log.Info("Client [%s] successfully authenticated with permission token.", ctlConn.RemoteAddr().String())
+	} else {
+		// If ExpectedPermissionToken is not set in frps.ini, skip this check.
+		// Log if a token was provided anyway, for audit/debugging.
+		if loginMsg.PermissionToken != "" {
+			log.Info("Client [%s] provided a permission token, but no expected token is configured on the server. Token: [%s]", ctlConn.RemoteAddr().String(), loginMsg.PermissionToken)
+		}
+	}
+
 	// If client's RunId is empty, it's a new client, we just create a new controller.
 	// Otherwise, we check if there is one controller has the same run id. If so, we release previous controller and start new one.
 	if loginMsg.RunId == "" {

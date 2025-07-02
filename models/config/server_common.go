@@ -76,6 +76,10 @@ type ServerCommonConf struct {
 	MaxPortsPerClient int64 `json:"max_ports_per_client"`
 	HeartBeatTimeout  int64 `json:"heart_beat_timeout"`
 	UserConnTimeout   int64 `json:"user_conn_timeout"`
+
+	// ExpectedPermissionToken is the token that clients must provide for additional auth.
+	// If empty, this check is skipped.
+	ExpectedPermissionToken string `json:"expected_permission_token"`
 }
 
 func GetDefaultServerConf() *ServerCommonConf {
@@ -106,6 +110,7 @@ func GetDefaultServerConf() *ServerCommonConf {
 		HeartBeatTimeout:  90,
 		UserConnTimeout:   10,
 		Custom404Page:     "",
+		ExpectedPermissionToken: "",
 	}
 }
 
@@ -307,6 +312,10 @@ func UnmarshalServerConfFromIni(defaultCfg *ServerCommonConf, content string) (c
 		} else {
 			cfg.HeartBeatTimeout = v
 		}
+	}
+
+	if tmpStr, ok = conf.Get("common", "expected_permission_token"); ok {
+		cfg.ExpectedPermissionToken = tmpStr
 	}
 	return
 }

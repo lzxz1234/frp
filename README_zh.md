@@ -457,7 +457,26 @@ admin_pwd = admin
 
 ### 身份验证
 
-服务端和客户端的 common 配置中的 `token` 参数一致则身份验证通过。
+frp 支持多种身份验证方法：
+
+1.  **Token 验证**: 服务端和客户端的 common 配置中的 `token` 参数一致则身份验证通过。这是基础的身份验证机制。
+2.  **权限 Token 验证 (Permission Token)**: 从 vX.Y.Z 版本开始 (请替换为实际版本号), 可以在 `frpc.ini` 的 `[common]` 段配置 `permission_token` 并在 `frps.ini` 的 `[common]` 段配置 `expected_permission_token`。如果服务器配置了 `expected_permission_token`，则客户端必须提供匹配的 `permission_token` 才能成功登录。这为需要更精细访问控制的场景提供了一个额外的验证层。如果服务器未配置 `expected_permission_token`，则客户端即使发送了 `permission_token` 也不会强制校验此项。
+
+    *   frpc.ini 示例:
+        ```ini
+        [common]
+        server_addr = x.x.x.x
+        server_port = 7000
+        token = basic_auth_token
+        permission_token = more_secure_permission_token
+        ```
+    *   frps.ini 示例:
+        ```ini
+        [common]
+        bind_port = 7000
+        token = basic_auth_token
+        expected_permission_token = more_secure_permission_token
+        ```
 
 ### 加密与压缩
 
